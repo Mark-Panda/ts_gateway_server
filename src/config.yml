@@ -1,0 +1,45 @@
+#网关服务配置
+gatewayServe:
+  port: 6701
+  serveName: 'gateway_serve'
+  # 路由白名单
+  whileList: ['dev', 'health', 'login', 'checkServiceStatus', 'playground']
+  token:
+    secret: 5B594812A0E15B63867DBD0C7C27564D
+    expires: 7
+#consul服务配置
+consulServe:
+  # host: '192.168.1.102'
+  host: '127.0.0.1'
+  port: 8500
+
+# 数据库连接配置
+dbConfig:
+  link: 'mysql://root:prisma@localhost:3306/ebrserver'
+
+# redis配置
+cacheConfig:
+  host: '127.0.0.1' #  172.26.165.67   172.26.15.40
+  port: 6379
+
+# 微服务路由标识
+serveSignURL:
+  [
+    'commonApi': 'gateway_serve',
+    'flow': 'miServe',
+    'common': 'baseServe',
+    'node': 'nodeServe',
+    'java': 'javaServe',
+    'develop': 'devServe',
+  ]
+
+# 所有服务列表
+serveList:
+  [
+    'gateway_serve',
+    'miServe',
+    'baseServe',
+    'nodeServe',
+    'javaServe',
+    'devServe',
+  ]

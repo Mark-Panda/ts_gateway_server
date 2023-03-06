@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS", // 设置程序的模块系统， "None"， "CommonJS"， "AMD"， "System"， "UMD"， "ES6"或 "ES2015", "ESNext", "ES2020"，只有 "AMD"和 "System"能和 --outFile一起使用，"ES6"和 "ES2015"可使用在目标输出为 "ES5"或更低的情况下。默认值：target === "ES6" ? "ES6" : "commonjs"
+    "declaration": true, // 生成声明文件.d.ts，开启后会自动生成声明文件
+    "removeComments": true, // 删除所有注释，除了以 /!*开头的版权信息
+    "emitDecoratorMetadata": true, // 使用Reflect Metadata
+    "experimentalDecorators": true, //启用实验性的ES装饰器
+    "allowSyntheticDefaultImports": true, //允许从没有设置默认导出的模块中默认导入
+    "target": "ES6", // 指定ECMAScript目标版本 "ES3"（默认）， "ES5"， "ES6"/ "ES2015"， "ES2016"， "ES2017"或 "ESNext"
+    "sourceMap": true, // 生成目标文件的sourceMap文件
+    "outDir": "dist/src", // 指定输出目录
+    "baseUrl": "./", // 解析非相对模块的基地址，默认是当前目录
+    "incremental": true, // TS编译器在第一次编译之后会生成一个存储编译信息的文件，第二次编译会在第一次的基础上进行增量编译，可以提高编译的速度
+    "skipLibCheck": true, //忽略所有的声明文件（ *.d.ts）的类型检查
+    "strictNullChecks": false, // 不允许把null、undefined赋值给其他类型的变量.在严格的 null检查模式下， null和 undefined值不包含在任何类型里，只允许用它们自己和 any来赋值（有个例外， undefined可以赋值到 void）
+    "noImplicitAny": false, // 不允许隐式的any类型,在表达式和声明上有隐含的 any类型时报错
+    "strictBindCallApply": false, // 严格的bind/call/apply检查
+    "forceConsistentCasingInFileNames": false, //禁止对同一个文件的不一致的引用
+    "noFallthroughCasesInSwitch": false, // 防止switch语句贯穿(即如果没有break语句后面不会执行)
+    "resolveJsonModule": true, //允许导入扩展名为“.json”的模块
+    "esModuleInterop": true // 允许module.exports=xxx 导出，由import from 导入.因为很多老的js库使用了commonjs的导出方式，并且没有导出default属性
+    // "paths": { "@src/*": ["src/*"] } //定义路径别名，即当我们通过路径引入一个模块时，可以使用别名来进行引入，这里"@/*"是为了直接快捷的导入/src下的模块
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
