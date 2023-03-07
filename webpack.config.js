@@ -4,11 +4,13 @@ const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const rootPath = path.resolve(process.cwd());
 module.exports = (options) => {
     return {
         // we set the default target accordingly.
         target: 'node',
+        externals: [nodeExternals()],
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx'],
         },
@@ -22,7 +24,7 @@ module.exports = (options) => {
         },
         externals: [/^(?!\.|\/).+/i],
         node: {
-            __filename: true,
+            // __filename: true,
             __dirname: true,
         },
 
@@ -48,6 +50,7 @@ module.exports = (options) => {
                         to: path.join(rootPath, 'dist'),
                     },
                     { from: 'src/views/**/*', to: path.join(rootPath, 'dist') },
+                    { from: 'watch/**/*', to: path.join(rootPath, 'dist') },
                 ],
                 options,
             ),

@@ -1,13 +1,12 @@
 import express from 'express';
 import { fork } from 'child_process';
-import path from 'path';
+import path, { join } from 'path';
 import config from './config';
 import { connectLogger } from 'log4js';
 import { LoggerService } from './db/log';
 import router from './routers/router';
-import serviceLocalStorage from './discovery/local-storage';
 import { proxyRuleCheck, proxyForward } from './proxy/middle';
-const { gatewayServe, rootPath, staticPath } = config;
+const { gatewayServe, staticPath } = config;
 const app = express();
 
 // TODO: 代理graphql请求的话bodyParser中间件会影响代理转发，如果后续仍有问题需要解决
@@ -81,46 +80,49 @@ app.use('/', router);
  */
 app.use(proxyForward());
 
-// // fork一个子进程，用于监听服务节点变化
-// const workerProcess = fork(
-//     rootPath + '/src/watch/startWatch' + path.extname(__filename),
-// );
+const watchFile = join(__dirname, '../watch/startWatch');
+// fork一个子进程，用于监听服务节点变化
+const workerProcess = fork(watchFile);
 
-// // 子进程退出
-// workerProcess.on('exit', function (code) {
-//     loggerService.log(`服务发现子进程已退出: ${code}`, 'watchServer');
-// });
-// workerProcess.on('error', function (error) {
-//     loggerService.log(`服务发现进程错误: ${error}`, 'watchServer');
-// });
+// 子进程退出
+workerProcess.on('exit', function (code) {
+    loggerService.log(`服务发现子进程已退出: ${code}`, 'watchServer');
+});
+workerProcess.on('error', function (error) {
+    loggerService.log(`服务发现进程错误: ${error}`, 'watchServer');
+});
 
-// // 接收变化的服务列表，并更新到缓存中
-// workerProcess.on('message', (msg: any) => {
-//     if (msg) {
-//         loggerService.log(
-//             `从监控中数据变化：${JSON.stringify(msg)}`,
-//             'watchServer',
-//         );
-//         const serveList = [];
-//         for (const serveItem of msg.data) {
-//             if (serveItem['Checks'][0]['Status'] === 'passing') {
-//                 const serveInfo = {
-//                     serveName: serveItem['Service']['Service'],
-//                     address: serveItem['Service']['Address'],
-//                     port: serveItem['Service']['Port'],
-//                     status: serveItem['Checks'][0]['Status'],
-//                 };
-//                 serveList.push(serveInfo);
-//             }
-//         }
-//         loggerService.debug(
-//             `${msg.name}微服务信息: ` + serveList,
-//             'watchServer',
-//         );
-//         //更新缓存中服务列表
-//         serviceLocalStorage.setItem(msg.name, serveList);
-//     }
-// });
+// 接收变化的服务列表，并更新到缓存中
+workerProcess.on('message', (msg: any) => {
+    if (msg) {
+        loggerService.log(
+            `从监控中数据变化：${JSON.stringify(msg)}`,
+            'watchServer',
+        );
+        if (msg.data) {
+            const serveList = [];
+            for (const serveItem of msg.data) {
+                if (serveItem['Checks'][0]['Status'] === 'passing') {
+                    const serveInfo = {
+                        serveName: serveItem['Service']['Service'],
+                        address: serveItem['Service']['Address'],
+                        port: serveItem['Service']['Port'],
+                        status: serveItem['Checks'][0]['Status'],
+                    };
+                    serveList.push(serveInfo);
+                }
+            }
+            loggerService.debug(
+                `${msg.name}微服务信息: ` + serveList,
+                'watchServer',
+            );
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const serviceLocalStorage = require('../watch/local-storage');
+            //更新缓存中服务列表
+            serviceLocalStorage.setItem(msg.name, serveList);
+        }
+    }
+});
 
 app.listen(gatewayServe.port, () => {
     loggerService.log('服务运行端口: ' + gatewayServe.port, 'gatewayServer');

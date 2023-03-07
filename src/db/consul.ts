@@ -204,12 +204,10 @@ export class ConsulConfig {
 }
 
 const osIp = getIpAddress();
-console.log('-----本机IP地址-----', osIp);
 export const consulClient = new ConsulConfig({
     consulhost: consulServe.host,
     consulport: consulServe.port,
-    // servicehost: '172.26.165.67',
     servicehost: osIp, //本机IP
-    serviceport: 3100, // 本机服务端口
+    serviceport: gatewayServe.port, // 本机服务端口
     serviceName: gatewayServe.serveName,
 });

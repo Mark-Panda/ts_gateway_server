@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "CommonJS", // 设置程序的模块系统， "None"， "CommonJS"， "AMD"， "System"， "UMD"， "ES6"或 "ES2015", "ESNext", "ES2020"，只有 "AMD"和 "System"能和 --outFile一起使用，"ES6"和 "ES2015"可使用在目标输出为 "ES5"或更低的情况下。默认值：target === "ES6" ? "ES6" : "commonjs"
+    "moduleResolution": "node",
     "declaration": true, // 生成声明文件.d.ts，开启后会自动生成声明文件
     "removeComments": true, // 删除所有注释，除了以 /!*开头的版权信息
     "emitDecoratorMetadata": true, // 使用Reflect Metadata

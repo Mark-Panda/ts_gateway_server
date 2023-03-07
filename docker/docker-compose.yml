@@ -3,69 +3,19 @@ version: '3.0'
 services:
   # consul server，对外暴露的ui接口为8500，只有在2台consul服务器的情况下集群才起作用
   consulserver:
-    image: progrium/consul:latest
+    image: consul:latest
     hostname: consulserver
     ports:
       - '8300'
       - '8400'
       - '8500:8500'
       - '53'
-    command: -server -ui-dir /ui -data-dir /tmp/consul --bootstrap-expect=2
+    command: [agent, -server, -ui, -client=0.0.0.0, -bootstrap-expect=1]
+    volumes:
+      - ../volumes/consul4/data:/consul/data
+      - ../volumes/consul4/log:/consul/log
+      - ../volumes/consul4/consul-client.json:/consul/config/consul.json
     networks:
       - app
 networks:
   app:
-#   # consul server1在consul server服务起来后，加入集群中
-#   consulserver1:
-#     image: progrium/consul:latest
-#     hostname: consulserver1
-#     depends_on:
-#       - 'consulserver'
-#     ports:
-#       - '8300'
-#       - '8400'
-#       - '8500'
-#       - '53'
-#     command: -server -data-dir /tmp/consul -join consulserver
-#     networks:
-#       - app
-#   # consul server2在consul server服务起来后，加入集群中
-#   consulserver2:
-#     image: progrium/consul:latest
-#     hostname: consulserver2
-#     depends_on:
-#       - 'consulserver'
-#     ports:
-#       - '8300'
-#       - '8400'
-#       - '8500'
-#       - '53'
-#     command: -server -data-dir /tmp/consul -join consulserver
-#     networks:
-#       - app
-
-#   mysql:
-#     image: mariadb:latest
-#     restart: always
-#     ports:
-#       - '3306:3306'
-#     environment:
-#       MYSQL_ROOT_PASSWORD: prisma
-#     volumes:
-#       - ../volumes/database_mysql-data:/var/lib/mysql
-#     command: ['mysqld', '--event-scheduler=ON']
-#     networks:
-#       - app
-#   redis:
-#     image: redis:latest
-#     restart: always
-#     command: ['redis-server', '--appendonly', 'yes']
-#     hostname: redis
-#     volumes:
-#       - ../volumes/database_redis-data:/data
-#     ports:
-#       - '6379:6379'
-#     networks:
-#       - app
-# networks:
-#   app:

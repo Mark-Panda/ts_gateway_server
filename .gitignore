@@ -4,7 +4,7 @@ docker/registrator
 build
 dist
 volumes
-
+DockerData
 logs
 
 #MacOS 配置文件

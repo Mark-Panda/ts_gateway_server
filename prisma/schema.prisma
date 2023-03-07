@@ -6,6 +6,7 @@ datasource db {
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
+  binaryTargets = ["native"]
 }
 
 /// 组织机构- 对应集团，公司，部门
