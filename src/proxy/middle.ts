@@ -56,15 +56,17 @@ export const proxyRuleCheck = () => {
                     }
                     // 没有运行直接抛出错误提示服务尚未运行
                     return res.json({
+                        code: '',
                         error: 'NOSERVER',
                         msg: `${item[baseUrl]}服务未运行`,
                     });
                 }
             }
-            return res.json({ error: 'NOAPI', msg: 'API不存在' });
+            return res.json({ code: '', error: 'NOAPI', msg: 'API不存在' });
         } catch (error) {
             res.status(401);
             res.json({
+                code: '',
                 error: 'PROXY_CHECK_ERROR',
                 msg: '路由代理规则检查异常',
             });
@@ -87,7 +89,11 @@ export const proxyForward = () => {
             logger.debug('服务代理地址:' + req.proxyTargetUrl, 'proxyServer');
             /* 如果req.proxyTargetUrl不存在或者为空字符串，表示代理服务未找到 */
             if (!req.proxyTargetUrl || req.proxyTargetUrl === '') {
-                res.json({ error: 'NOSERVER', msg: '服务未启动或不可达!' });
+                res.json({
+                    code: '',
+                    error: 'NOSERVER',
+                    msg: '服务未启动或不可达!',
+                });
             }
             /* 代理前赋值用户角色信息 */
         },
@@ -96,7 +102,7 @@ export const proxyForward = () => {
         // },
         onError: async function (err, req, res) {
             logger.error('服务代理异常' + err, 'proxyServer');
-            res.json({ error: 'PROXY_ERROR', msg: '服务请求异常!' });
+            res.json({ code: '', error: 'PROXY_ERROR', msg: '服务请求异常!' });
         },
     });
 };

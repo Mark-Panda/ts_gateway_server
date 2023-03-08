@@ -3,13 +3,15 @@ gatewayServe:
   port: 6701
   serveName: 'gateway_serve'
   # 路由白名单
-  whileList: ['dev', 'health', 'login', 'checkServiceStatus', 'playground']
+  whileList: ['dev', 'health', 'login', 'playground']
+  login:
+    # 重试等待时间 分钟
+    waiting: 5
   token:
     secret: 5B594812A0E15B63867DBD0C7C27564D
     expires: 7
 #consul服务配置
 consulServe:
-  # host: '192.168.1.102'
   host: '127.0.0.1'
   port: 8500
 

@@ -6,6 +6,7 @@ import { connectLogger } from 'log4js';
 import { LoggerService } from './db/log';
 import router from './routers/router';
 import { proxyRuleCheck, proxyForward } from './proxy/middle';
+import { authMiddlware } from './util/middle';
 const { gatewayServe, staticPath } = config;
 const app = express();
 
@@ -63,7 +64,7 @@ app.use(
 /**
  * 鉴权中间件
  */
-// app.use(authMiddlwware())
+app.use(authMiddlware());
 
 /**
  * 路由代理规则检查中间件
