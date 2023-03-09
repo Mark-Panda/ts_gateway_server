@@ -6,8 +6,8 @@ import {
     delToken,
     getCacheUserInfo,
     lockCheck,
-    setUserOperation,
-    updateUserOperation,
+    setUserCacheInfo,
+    updateUserCacheInfo,
     verifyToken,
 } from '../util/verify';
 import { getUserInfo } from '../util/user';
@@ -69,8 +69,8 @@ router.post(
 
             // 生成token
             const tokenInfo = await createToken(username, loginType);
-            // 存储用户操作信息
-            await setUserOperation(username);
+            // 存储用户信息
+            await setUserCacheInfo(username);
             // 返回token信息
             return res.json({ data: tokenInfo });
         } catch (error) {
@@ -142,7 +142,7 @@ router.put('/login', bodyParser.json(), async (req: Request, res: Response) => {
         // 生成token
         const tokenInfo = await createToken(username, loginType);
         // 存储用户操作信息
-        await updateUserOperation(username);
+        await updateUserCacheInfo(username);
         // 返回token信息
         return res.json({ data: tokenInfo });
     } catch (error) {

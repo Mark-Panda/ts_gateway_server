@@ -7,7 +7,7 @@ import { getPersonInfo } from './user';
 /**
  * 创建令牌
  * @param {*} username 用户名
- * @param {*} loginType 登录方式 mobile webApp webAdmin win
+ * @param {*} loginType 登录方式 mobile webApp webAdmin pad
  * @returns
  */
 export const createToken = async (username: any, loginType: any) => {
@@ -82,8 +82,9 @@ export const delTokenByName = async (username: any, loginType: any) => {
  */
 export const lockCheck = async (username: string) => {
     //查询Redis信息
-    const userOperation: any = await redisClient.hgetall(
+    const userOperation: any = await redisClient.hget(
         `${username}.UserInfo`,
+        'info',
     );
     const pass = !userOperation.waiting || userOperation.waiting <= Date.now();
     if (userOperation.waiting && userOperation.waiting <= Date.now()) {
@@ -98,11 +99,10 @@ export const lockCheck = async (username: string) => {
 };
 
 /**
- * 用户操作信息缓存
+ * 用户信息缓存
  * @param username 用户名
- * @param operation 用户操作信息
  */
-export const setUserOperation = async (username: string) => {
+export const setUserCacheInfo = async (username: string) => {
     const userBaseInfo: any = await getPersonInfo(username);
     userBaseInfo.waiting = moment()
         .add(config.gatewayServe.login.waiting, 'minutes')
@@ -114,22 +114,19 @@ export const setUserOperation = async (username: string) => {
 };
 
 /**
- * 更新用户操作锁屏时间缓存
+ * 更新用户信息锁屏时间缓存
  * @param username 用户名
- * @param operation 用户操作信息
+ * @param userInfo 用户信息
  */
-export const updateUserOperation = async (username: string) => {
-    let operatInfo: any = await redisClient.hget(
-        `${username}.UserInfo`,
-        'info',
-    );
-    operatInfo = JSON.parse(operatInfo);
-    operatInfo.waiting = moment()
+export const updateUserCacheInfo = async (username: string) => {
+    let userInfo: any = await redisClient.hget(`${username}.UserInfo`, 'info');
+    userInfo = JSON.parse(userInfo);
+    userInfo.waiting = moment()
         .add(config.gatewayServe.login.waiting, 'minutes')
         .valueOf();
     await redisClient.hmset(`${username}.UserInfo`, [
         'info',
-        JSON.stringify(operatInfo),
+        JSON.stringify(userInfo),
     ]);
 };
 

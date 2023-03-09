@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { redisClient } from '../db/redis';
+import interceptor from 'express-interceptor';
 import { verifyToken } from './verify';
+import { redisClient } from '../db/redis';
+import { auditBehave } from './auditBehavioral';
+import { getPersonInfo } from './user';
 
 /**
  * 登录鉴权
@@ -15,7 +18,7 @@ export const authMiddlware = () => {
                 const userInfo: any = await verifyToken(token);
                 // 判断token是否在Redis中存在
                 const cacheToken = await redisClient.get(
-                    `${userInfo.name}-${req.headers['loginType']}`,
+                    `${userInfo.name}.${req.headers['loginType']}`,
                 );
                 // token在Redis中不存在
                 if (!cacheToken) {
@@ -41,6 +44,20 @@ export const authMiddlware = () => {
                         message: '令牌已失效,请重新登陆!',
                     });
                 }
+                // 将信息放到请求信息中方便后续获取 TODO: 是否需要加密,防止外部直接模拟
+                // 从Redis中获取或者直接查数据库
+                const userCacheInfo: any = await redisClient.hget(
+                    `${userInfo.name}.UserInfo`,
+                    'info',
+                );
+                if (userCacheInfo) {
+                    req['user'] = userCacheInfo;
+                } else {
+                    const userBaseInfo: any = await getPersonInfo(
+                        userInfo.name,
+                    );
+                    req['user'] = userBaseInfo;
+                }
                 next();
             } else {
                 res.json({
@@ -54,3 +71,16 @@ export const authMiddlware = () => {
         }
     };
 };
+
+/**
+ * 用户行为操作跟踪
+ */
+export const auditInterceptor = interceptor(function (req: any) {
+    return {
+        isInterceptable: () => true,
+        intercept: async function (body: any, send: any) {
+            await auditBehave(req, body);
+            send(body);
+        },
+    };
+});

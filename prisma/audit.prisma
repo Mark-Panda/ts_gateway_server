@@ -1,0 +1,113 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("AUDIT_DATABASE_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    output          = "../node_modules/@auditprisma/client"
+    previewFeatures = ["fullTextSearch"]
+}
+
+/// 审计操作方法
+model AuditMethod {
+    id        String       @id @default(cuid()) @db.Char(25)
+    /// 创建时间
+    createdAt DateTime     @default(now())
+    /// 更新时间
+    updatedAt DateTime     @updatedAt
+    /// 编码
+    code      String
+    // 名称
+    name      String
+    //  英文
+    name_en   String?
+    //   方法 如:Mutation.usersDelete
+    method    String       @unique
+    // 字段
+    fields    AuditField[]
+}
+
+/// 审计内容
+model AuditField {
+    id        String   @id @default(cuid()) @db.Char(25)
+    /// 创建时间
+    createdAt DateTime @default(now())
+    /// 更新时间
+    updatedAt DateTime @updatedAt
+    // 编码
+    code      String
+    //  名称
+    name      String
+    //  英文
+    name_en   String?
+
+    // "操作id"
+    methodId String      @db.Char(25)
+    method   AuditMethod @relation(fields: [methodId], references: [id])
+}
+
+/// 审计追溯
+model AuditTrace {
+    id               String          @id @default(cuid()) @db.Char(25)
+    /// 创建时间
+    createdAt        DateTime        @default(now())
+    /// 更新时间
+    updatedAt        DateTime        @updatedAt
+    // 模块 对应模块编码
+    module           String?
+    //   方法 如:Mutation.usersDelete
+    method           String
+    //   操作 对应菜单关联的 action.id
+    action           String?
+    //   操作目标对象 users
+    actionTarget     String
+    //   追溯编码,对应操作目标(actionTarget)中的数据.id
+    actionData       String
+    //   操作时间
+    actionDate       DateTime
+    //   版本号
+    version          Int?            @default(value: 0)
+    //   操作员
+    username         String
+    //   工作中心
+    workCenter       Json
+    //   工作站
+    workStation      Json
+    //   请求信息
+    request          Json
+    //   应答信息,如果是删除操作，包含所有被删除的信息
+    response         Json
+    //   关联关系
+    relation         Json?
+    //   删除的数据
+    isDelete         Boolean         @default(value: false)
+    //   操作说明
+    description      String
+    // "签名追溯"
+    signatureTraceId String?         @unique @db.Char(25)
+    signatureTrace   SignatureTrace? @relation(fields: [signatureTraceId], references: [id])
+}
+
+/// 签名追溯
+model SignatureTrace {
+    id          String      @id @default(cuid()) @db.Char(25)
+    /// 创建时间
+    createdAt   DateTime    @default(now())
+    /// 更新时间
+    updatedAt   DateTime    @updatedAt
+    // 签名组名称
+    group       String?
+    //   工作站
+    workStation Json
+    //   工作站
+    workCenter  Json
+    //   签名信息
+    info        Json
+    //   操作说明
+    description String
+    //   签名时间
+    signatureAt DateTime?
+    // "追踪数据"
+    trace       AuditTrace?
+}
