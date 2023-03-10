@@ -4,7 +4,6 @@ import { resolve, join } from 'path';
 import { getField, setField } from '../util/index';
 
 const rootPath = resolve(process.cwd());
-console.log('----rootPath', __dirname);
 const { NODE_ENV } = process.env;
 const sysConfig = join(__dirname, '../config.yml');
 const sysInfo: any = yaml.load(fs.readFileSync(sysConfig, 'utf8'));
@@ -43,7 +42,7 @@ initConfigField(
     config.consulServe,
     'host',
     process.env.CONFIG_CONSULSERVE_HOST,
-    '192.168.1.102',
+    '127.0.0.1',
 );
 
 // 获取环境变量中consul服务的访问端口
@@ -52,6 +51,38 @@ initConfigField(
     'port',
     process.env.CONFIG_CONSULSERVE_PORT,
     8500,
+);
+
+// 获取环境变量中mysql连接信息
+initConfigField(
+    config.dbConfig,
+    'link',
+    process.env.CONFIG_DBCONFIG_LINK,
+    'mysql://root:prisma@localhost:3306/ebrserver',
+);
+
+// 获取环境变量中postgre连接信息
+initConfigField(
+    config.dbConfig,
+    'postgreLink',
+    process.env.CONFIG_DBCONFIG_POSTGRELINK,
+    'postgresql://prisma:prisma@localhost:5432/ebrserver?schema=public',
+);
+
+// 获取环境变量中Redis连接信息
+initConfigField(
+    config.cacheConfig,
+    'host',
+    process.env.CONFIG_CACHECONFIG_HOST,
+    '127.0.0.1',
+);
+
+// 获取环境变量中Redis端口连接信息
+initConfigField(
+    config.cacheConfig,
+    'port',
+    process.env.CONFIG_CACHECONFIG_PORT,
+    6379,
 );
 
 export default config;
