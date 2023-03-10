@@ -10,7 +10,7 @@ const auditClient = new PrismaClient({
     errorFormat: 'colorless',
     datasources: {
         db: {
-            url: config.dbConfig.link, //覆盖@prisma/client方式
+            url: config.dbConfig.postgreLink, //覆盖@prisma/client方式
         },
     },
     log: [

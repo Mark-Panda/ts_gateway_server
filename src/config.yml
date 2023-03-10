@@ -18,6 +18,7 @@ consulServe:
 # 数据库连接配置
 dbConfig:
   link: 'mysql://root:prisma@localhost:3306/ebrserver'
+  postgreLink: 'postgresql://prisma:prisma@localhost:5432/ebrserver?schema=public'
 
 # redis配置
 cacheConfig:
