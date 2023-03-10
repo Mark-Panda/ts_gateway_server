@@ -28,7 +28,6 @@ cacheConfig:
 # 微服务路由标识
 serveSignURL:
   [
-    'commonApi': 'gateway_serve',
     'flow': 'miServe',
     'common': 'baseServe',
     'node': 'nodeServe',

@@ -1,6 +1,6 @@
 import util from 'util';
-import { createAuditTrace } from './audit';
 import { redisClient } from '../db/redis';
+import auditClient from '../db/audit';
 export const auditBehave = async (req: any, res: any) => {
     try {
         const username = req.user ? req.user.name : 'anonymous';
@@ -63,3 +63,49 @@ function clearSecretInfo(request: any) {
         }
     }
 }
+
+/**
+ * 添加审计跟踪数据
+ *  语义化翻译跟踪内容
+ * @param {Object} param0 跟踪信息
+ */
+const createAuditTrace = async ({
+    moduleCode,
+    method,
+    action,
+    actionTarget,
+    actionData,
+    actionDate,
+    workCenter,
+    workStation,
+    username,
+    request,
+    response,
+    relation = '{}',
+    isDelete,
+    description = '',
+}) => {
+    const data = {
+        module: moduleCode,
+        method,
+        actionData,
+        action,
+        actionTarget,
+        actionDate,
+        username,
+        workCenter,
+        workStation,
+        request,
+        response,
+        relation,
+        isDelete,
+        description,
+    };
+    return await auditClient.auditTrace.create({
+        data,
+        select: {
+            id: true,
+            description: true,
+        },
+    });
+};
